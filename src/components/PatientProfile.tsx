@@ -867,252 +867,414 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patientId, onBack }) =>
 
       {/* Contenido de las pestañas */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'info' && (
-          <div className="card">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              <div className="card bg-gray-50">
-                <div className="text-sm text-gray-500 mb-1">Peso actual</div>
-                <div className="text-xl sm:text-2xl font-bold text-primary-600">
-                  {patient.weightHistory[patient.weightHistory.length - 1]?.weight || 0} kg
-                </div>
-              </div>
-              <div className="card bg-gray-50">
-                <div className="text-sm text-gray-500 mb-1">IMC actual</div>
-                <div className="text-xl sm:text-2xl font-bold text-success-600">{getCurrentIMC()}</div>
-                <div className={`text-xs font-medium ${getIMCCategory(getCurrentIMC()).color}`}>
-                  {getIMCCategory(getCurrentIMC()).category}
-                </div>
-              </div>
-              <div className="card bg-gray-50">
-                <div className="text-sm text-gray-500 mb-1">Progreso objetivo</div>
-                <div className="text-xl sm:text-2xl font-bold text-warning-600">{getGoalProgress().toFixed(0)}%</div>
+      {activeTab === 'info' && (
+  <div className="space-y-8">
+    {/* Key Metrics Section - More visual with icons */}
+    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+      <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+        <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        Métricas Clave
+      </h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-white/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm font-medium text-gray-600 mb-1">Peso Actual</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {patient.weightHistory[patient.weightHistory.length - 1]?.weight || 0} kg
               </div>
             </div>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-medium text-gray-900">Información del Paciente</h3>
-              {!editingInfo ? (
-                <button
-                  onClick={() => setEditingInfo(true)}
-                  className="btn-secondary"
-                >
-                  Editar Información
-                </button>
-              ) : (
-                <div className="space-x-2">
-                  <button
-                    onClick={handleSaveInfo}
-                    disabled={submittingInfo}
-                    className="btn-primary"
-                  >
-                    {submittingInfo ? (
-                      <div className="flex items-center">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Guardando...
-                      </div>
-                    ) : (
-                      'Guardar'
-                    )}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingInfo(false);
-                      setTempInfo({
-                        name: patient?.name || '',
-                        email: patient?.email || '',
-                        phone: patient?.phone || '',
-                        age: patient?.age || 0,
-                        gender: patient?.gender || 'male',
-                        height: patient?.height || 0
-                      });
-                    }}
-                    className="btn-secondary"
-                    disabled={submittingInfo}
-                  >
-                    Cancelar
-                  </button>
+            <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-white/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm font-medium text-gray-600 mb-1">IMC Actual</div>
+              <div className="text-2xl font-bold text-green-600">{getCurrentIMC()}</div>
+              <div className={`text-xs font-semibold px-2 py-1 rounded-full mt-1 inline-block ${
+                getIMCCategory(getCurrentIMC()).category === 'Normal' ? 'bg-green-100 text-green-800' :
+                getIMCCategory(getCurrentIMC()).category === 'Sobrepeso' ? 'bg-yellow-100 text-yellow-800' :
+                getIMCCategory(getCurrentIMC()).category === 'Obesidad' ? 'bg-red-100 text-red-800' :
+                'bg-blue-100 text-blue-800'
+              }`}>
+                {getIMCCategory(getCurrentIMC()).category}
+              </div>
+            </div>
+            <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-white/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm font-medium text-gray-600 mb-1">Progreso</div>
+              <div className="text-2xl font-bold text-purple-600">{getGoalProgress().toFixed(0)}%</div>
+              <div className="mt-2">
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${getGoalProgress()}%` }}
+                  ></div>
                 </div>
-              )}
+              </div>
+            </div>
+            <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
+              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Patient Information Section */}
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+      <div className="px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+            <svg className="w-5 h-5 text-gray-700 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Información Personal
+          </h3>
+          {!editingInfo ? (
+            <button
+              onClick={() => setEditingInfo(true)}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Editar
+            </button>
+          ) : (
+            <div className="flex space-x-2">
+              <button
+                onClick={handleSaveInfo}
+                disabled={submittingInfo}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+              >
+                {submittingInfo ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Guardar
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  setEditingInfo(false);
+                  setTempInfo({
+                    name: patient?.name || '',
+                    email: patient?.email || '',
+                    phone: patient?.phone || '',
+                    age: patient?.age || 0,
+                    gender: patient?.gender || 'male',
+                    height: patient?.height || 0
+                  });
+                }}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+                disabled={submittingInfo}
+              >
+                Cancelar
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="p-6">
+        {editingInfo ? (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide border-b border-gray-200 pb-2">
+                  Información Básica
+                </h4>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nombre completo *
+                  </label>
+                  <input
+                    type="text"
+                    value={tempInfo.name}
+                    onChange={(e) => setTempInfo(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Nombre y apellidos"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Edad *
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="120"
+                    value={tempInfo.age}
+                    onChange={(e) => setTempInfo(prev => ({ ...prev, age: Number(e.target.value) }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="25"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Género *
+                  </label>
+                  <select
+                    value={tempInfo.gender}
+                    onChange={(e) => setTempInfo(prev => ({ ...prev, gender: e.target.value as 'male' | 'female' | 'other' }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="male">Masculino</option>
+                    <option value="female">Femenino</option>
+                    <option value="other">Otro</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide border-b border-gray-200 pb-2">
+                  Información de Contacto
+                </h4>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={tempInfo.email}
+                    onChange={(e) => setTempInfo(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="email@ejemplo.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Teléfono
+                  </label>
+                  <input
+                    type="tel"
+                    value={tempInfo.phone}
+                    onChange={(e) => setTempInfo(prev => ({ ...prev, phone: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="+34 600 000 000"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Altura (cm) *
+                  </label>
+                  <input
+                    type="number"
+                    min="100"
+                    max="250"
+                    value={tempInfo.height}
+                    onChange={(e) => setTempInfo(prev => ({ ...prev, height: Number(e.target.value) }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="170"
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
-            {editingInfo ? (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Nombre completo *
-                    </label>
-                    <input
-                      type="text"
-                      value={tempInfo.name}
-                      onChange={(e) => setTempInfo(prev => ({ ...prev, name: e.target.value }))}
-                      className="input-field"
-                      placeholder="Nombre y apellidos"
-                      required
-                    />
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-blue-700">
+                    <strong>Información importante:</strong> Los campos marcados con * son obligatorios. 
+                    La altura se utiliza para calcular automáticamente el IMC.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Personal Information Column */}
+            <div className="space-y-6">
+              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide border-b border-gray-200 pb-2">
+                Información Personal
+              </h4>
+              
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      value={tempInfo.email}
-                      onChange={(e) => setTempInfo(prev => ({ ...prev, email: e.target.value }))}
-                      className="input-field"
-                      placeholder="email@ejemplo.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Teléfono
-                    </label>
-                    <input
-                      type="tel"
-                      value={tempInfo.phone}
-                      onChange={(e) => setTempInfo(prev => ({ ...prev, phone: e.target.value }))}
-                      className="input-field"
-                      placeholder="+34 600 000 000"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Edad *
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="120"
-                      value={tempInfo.age}
-                      onChange={(e) => setTempInfo(prev => ({ ...prev, age: Number(e.target.value) }))}
-                      className="input-field"
-                      placeholder="25"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Género *
-                    </label>
-                    <select
-                      value={tempInfo.gender}
-                      onChange={(e) => setTempInfo(prev => ({ ...prev, gender: e.target.value as 'male' | 'female' | 'other' }))}
-                      className="input-field"
-                      required
-                    >
-                      <option value="male">Masculino</option>
-                      <option value="female">Femenino</option>
-                      <option value="other">Otro</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Altura (cm) *
-                    </label>
-                    <input
-                      type="number"
-                      min="100"
-                      max="250"
-                      value={tempInfo.height}
-                      onChange={(e) => setTempInfo(prev => ({ ...prev, height: Number(e.target.value) }))}
-                      className="input-field"
-                      placeholder="170"
-                      required
-                    />
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-500">Nombre completo</div>
+                    <div className="text-lg font-medium text-gray-900">{patient?.name || 'No especificado'}</div>
                   </div>
                 </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a1 1 0 011 1v9a1 1 0 01-1 1H5a1 1 0 01-1-1V8a1 1 0 011-1h3z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-500">Edad</div>
+                    <div className="text-lg font-medium text-gray-900">
+                      {patient?.age ? `${patient.age} años` : 'No especificado'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a3 3 0 100 6 3 3 0 000-6zM4 18a6 6 0 1112 0H4z" />
+                  </svg>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-500">Género</div>
+                    <div className="text-lg font-medium text-gray-900">
+                      {patient?.gender === 'male' ? 'Masculino' : 
+                        patient?.gender === 'female' ? 'Femenino' : 
+                        patient?.gender === 'other' ? 'Otro' : 'No especificado'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M4 2h2v20H4V2zm14 0h2v20h-2V2zm-6 0h2v20h-2V2z" />
+                  </svg>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-500">Altura</div>
+                    <div className="text-lg font-medium text-gray-900">
+                      {patient?.height ? `${patient.height} cm` : 'No especificado'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Information Column */}
+            <div className="space-y-6">
+              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide border-b border-gray-200 pb-2">
+                Información de Contacto
+              </h4>
+              
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-500">Email</div>
+                    <div className="text-lg font-medium text-gray-900">
+                      {patient?.email || 'No especificado'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-500">Teléfono</div>
+                    <div className="text-lg font-medium text-gray-900">
+                      {patient?.phone || 'No especificado'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Information */}
+              <div className="mt-8">
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide border-b border-gray-200 pb-2 mb-4">
+                  Información Adicional
+                </h4>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
                       </svg>
                     </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-blue-700">
-                        <strong>Nota:</strong> Los campos marcados con * son obligatorios. 
-                        La altura se usa para calcular automáticamente el IMC.
-                      </p>
+                    <div className="flex-1">
+                      <div className="text-sm text-gray-500">Peso inicial</div>
+                      <div className="text-lg font-medium text-gray-900">
+                        {patient?.weightHistory[0]?.weight ? `${patient.weightHistory[0].weight} kg` : 'No registrado'}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="card bg-gray-50">
-                  <div className="text-sm text-gray-500 mb-1">Nombre completo</div>
-                  <div className="text-lg font-medium text-gray-900">{patient?.name || 'No especificado'}</div>
-                </div>
 
-                <div className="card bg-gray-50">
-                  <div className="text-sm text-gray-500 mb-1">Email</div>
-                  <div className="text-lg font-medium text-gray-900">
-                    {patient?.email || 'No especificado'}
-                  </div>
-                </div>
-
-                <div className="card bg-gray-50">
-                  <div className="text-sm text-gray-500 mb-1">Teléfono</div>
-                  <div className="text-lg font-medium text-gray-900">
-                    {patient?.phone || 'No especificado'}
-                  </div>
-                </div>
-
-                <div className="card bg-gray-50">
-                  <div className="text-sm text-gray-500 mb-1">Edad</div>
-                  <div className="text-lg font-medium text-gray-900">
-                    {patient?.age ? `${patient.age} años` : 'No especificado'}
-                  </div>
-                </div>
-
-                <div className="card bg-gray-50">
-                  <div className="text-sm text-gray-500 mb-1">Género</div>
-                  <div className="text-lg font-medium text-gray-900">
-                    {patient?.gender === 'male' ? 'Masculino' : 
-                     patient?.gender === 'female' ? 'Femenino' : 
-                     patient?.gender === 'other' ? 'Otro' : 'No especificado'}
-                  </div>
-                </div>
-
-                <div className="card bg-gray-50">
-                  <div className="text-sm text-gray-500 mb-1">Altura</div>
-                  <div className="text-lg font-medium text-gray-900">
-                    {patient?.height ? `${patient.height} cm` : 'No especificado'}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Información adicional */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <h4 className="text-md font-medium text-gray-900 mb-4">Información Adicional</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="card bg-gray-50">
-                  <div className="text-sm text-gray-500 mb-1">Peso inicial</div>
-                  <div className="text-lg font-medium text-gray-900">
-                    {patient?.weightHistory[0]?.weight ? `${patient.weightHistory[0].weight} kg` : 'No registrado'}
-                  </div>
-                </div>
-
-                <div className="card bg-gray-50">
-                  <div className="text-sm text-gray-500 mb-1">Paciente desde</div>
-                  <div className="text-lg font-medium text-gray-900">
-                    {patient?.createdAt ? patient.createdAt.toLocaleDateString('es-ES', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric'
-                    }) : 'No disponible'}
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0 h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h.01M3 20h18v-8H3v8z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm text-gray-500">Paciente desde</div>
+                      <div className="text-lg font-medium text-gray-900">
+                        {patient?.createdAt ? patient.createdAt.toLocaleDateString('es-ES', {
+                          day: '2-digit',
+                          month: 'long',
+                          year: 'numeric'
+                        }) : 'No disponible'}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         )}
+      </div>
+    </div>
+  </div>
+)}
 
         {activeTab === 'analytics' && (
           <div className="space-y-6">
