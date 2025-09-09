@@ -844,7 +844,7 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patientId, onBack }) =>
           <nav className="flex space-x-8">
             {[
               { id: 'info', label: 'Información', icon: '👤' },
-              { id: 'analytics', label: 'Analytics', icon: '📊' },
+              { id: 'analytics', label: 'Análisis', icon: '📊' },
               { id: 'goals', label: 'Objetivos', icon: '🎯' },
               { id: 'notes', label: 'Notas', icon: '📝' }
             ].map((tab) => (
@@ -869,6 +869,25 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patientId, onBack }) =>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'info' && (
           <div className="card">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+              <div className="card bg-gray-50">
+                <div className="text-sm text-gray-500 mb-1">Peso actual</div>
+                <div className="text-xl sm:text-2xl font-bold text-primary-600">
+                  {patient.weightHistory[patient.weightHistory.length - 1]?.weight || 0} kg
+                </div>
+              </div>
+              <div className="card bg-gray-50">
+                <div className="text-sm text-gray-500 mb-1">IMC actual</div>
+                <div className="text-xl sm:text-2xl font-bold text-success-600">{getCurrentIMC()}</div>
+                <div className={`text-xs font-medium ${getIMCCategory(getCurrentIMC()).color}`}>
+                  {getIMCCategory(getCurrentIMC()).category}
+                </div>
+              </div>
+              <div className="card bg-gray-50">
+                <div className="text-sm text-gray-500 mb-1">Progreso objetivo</div>
+                <div className="text-xl sm:text-2xl font-bold text-warning-600">{getGoalProgress().toFixed(0)}%</div>
+              </div>
+            </div>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-medium text-gray-900">Información del Paciente</h3>
               {!editingInfo ? (
