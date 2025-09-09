@@ -1270,45 +1270,136 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patientId, onBack }) =>
 )}
 
         {activeTab === 'analytics' && (
-          <div className="space-y-6">
-            {/* Resumen rápido mejorado */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <div className="card text-center">
-                <div className="text-2xl font-bold text-primary-600">
-                  {patient.weightHistory[patient.weightHistory.length - 1]?.weight || 0} kg
-                </div>
-                <div className="text-sm text-gray-500">Peso actual</div>
-              </div>
+          <div className="space-y-8">
+            {/* Enhanced Analytics Metrics Section */}
+            <div className="relative bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-8 border border-green-100 overflow-hidden">
+              {/* Background decoration */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-200/20 to-teal-200/20 rounded-full -translate-y-16 translate-x-16"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-emerald-200/20 to-green-200/20 rounded-full translate-y-12 -translate-x-12"></div>
               
-              <div className="card text-center">
-                <div className="text-2xl font-bold text-success-600">
-                  {getCurrentIMC()}
+              <div className="relative z-10">
+                <h3 className="text-xl font-bold text-gray-900 mb-8 flex items-center">
+                  <div className="p-2 bg-green-500 rounded-lg mr-3">
+                    <Activity className="w-6 h-6 text-white" />
+                  </div>
+                  Resumen de Análisis
+                </h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  {/* Weight Card */}
+                  <div className="group bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-soft hover:shadow-medium transition-all duration-300 border border-white/50 hover:scale-[1.02]">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="p-3 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors">
+                        <Scale className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold text-blue-600 mb-1">
+                          {patient.weightHistory[patient.weightHistory.length - 1]?.weight || 0}
+                        </div>
+                        <div className="text-sm font-medium text-gray-500">kg</div>
+                      </div>
+                    </div>
+                    <div className="text-sm font-semibold text-gray-700 mb-2">Peso Actual</div>
+                    <div className="h-2 bg-blue-100 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(100, (patient.weightHistory[patient.weightHistory.length - 1]?.weight / (patient.goals?.targetWeight || 100)) * 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  {/* BMI Card */}
+                  <div className="group bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-soft hover:shadow-medium transition-all duration-300 border border-white/50 hover:scale-[1.02]">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="p-3 bg-green-100 rounded-xl group-hover:bg-green-200 transition-colors">
+                        <Heart className="w-6 h-6 text-green-600" />
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold text-green-600 mb-1">
+                          {getCurrentIMC()}
+                        </div>
+                        <div className="text-sm font-medium text-gray-500">IMC</div>
+                      </div>
+                    </div>
+                    <div className="text-sm font-semibold text-gray-700 mb-2">IMC Actual</div>
+                    <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                      getIMCCategory(getCurrentIMC()).category === 'Normal' ? 'bg-green-100 text-green-800' :
+                      getIMCCategory(getCurrentIMC()).category === 'Sobrepeso' ? 'bg-yellow-100 text-yellow-800' :
+                      getIMCCategory(getCurrentIMC()).category === 'Obesidad' ? 'bg-red-100 text-red-800' :
+                      'bg-blue-100 text-blue-800'
+                    }`}>
+                      {getIMCCategory(getCurrentIMC()).category}
+                    </div>
+                  </div>
+
+                  {/* Progress Card with Circular Progress */}
+                  <div className="group bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-soft hover:shadow-medium transition-all duration-300 border border-white/50 hover:scale-[1.02]">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors">
+                        <Target className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <div className="relative w-16 h-16">
+                        {/* Circular Progress */}
+                        <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
+                          <circle
+                            cx="32"
+                            cy="32"
+                            r="28"
+                            fill="none"
+                            stroke="#e5e7eb"
+                            strokeWidth="4"
+                          />
+                          <circle
+                            cx="32"
+                            cy="32"
+                            r="28"
+                            fill="none"
+                            stroke="url(#analyticsProgressGradient)"
+                            strokeWidth="4"
+                            strokeLinecap="round"
+                            strokeDasharray={`${(getGoalProgress() / 100) * 175.9} 175.9`}
+                            className="transition-all duration-700 ease-out"
+                          />
+                          <defs>
+                            <linearGradient id="analyticsProgressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                              <stop offset="0%" stopColor="#8b5cf6" />
+                              <stop offset="100%" stopColor="#a855f7" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-sm font-bold text-purple-600">{getGoalProgress().toFixed(0)}%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-sm font-semibold text-gray-700 mb-2">Progreso del Objetivo</div>
+                    <div className="text-xs text-gray-500">
+                      {patient.goals?.targetWeight ? `Meta: ${patient.goals.targetWeight} kg` : 'Sin objetivo definido'}
+                    </div>
+                  </div>
+
+                  {/* Metrics Count Card */}
+                  <div className="group bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-soft hover:shadow-medium transition-all duration-300 border border-white/50 hover:scale-[1.02]">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="p-3 bg-indigo-100 rounded-xl group-hover:bg-indigo-200 transition-colors">
+                        <Activity className="w-6 h-6 text-indigo-600" />
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold text-indigo-600 mb-1">
+                          {patient.bodyMetrics.length}
+                        </div>
+                        <div className="text-sm font-medium text-gray-500">registros</div>
+                      </div>
+                    </div>
+                    <div className="text-sm font-semibold text-gray-700 mb-2">Métricas Registradas</div>
+                    <div className="h-2 bg-indigo-100 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(100, (patient.bodyMetrics.length / 10) * 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500">IMC actual</div>
-                <div className={`text-xs font-medium ${getIMCCategory(getCurrentIMC()).color}`}>
-                  {getIMCCategory(getCurrentIMC()).category}
-                </div>
-              </div>
-              
-              <div className="card text-center">
-                <div className="text-2xl font-bold text-warning-600">
-                  {getGoalProgress().toFixed(0)}%
-                </div>
-                <div className="text-sm text-gray-500">Progreso objetivo</div>
-              </div>
-              
-              <div className="card text-center">
-                <div className="text-2xl font-bold text-indigo-600">
-                  {patient.bodyMetrics.length}
-                </div>
-                <div className="text-sm text-gray-500">Métricas registradas</div>
-              </div>
-              
-              <div className="card text-center">
-                <div className="text-2xl font-bold text-gray-600">
-                  {patient.notes.length}
-                </div>
-                <div className="text-sm text-gray-500">Notas</div>
               </div>
             </div>
 
