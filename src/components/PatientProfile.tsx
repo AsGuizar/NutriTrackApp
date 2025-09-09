@@ -4,6 +4,7 @@ import { db, COLLECTIONS, Patient } from '../config/firebase';
 import { doc, onSnapshot, updateDoc, arrayUnion, serverTimestamp } from 'firebase/firestore';
 // @ts-ignore
 import Plotly from 'plotly.js-dist';
+import { Activity, Scale, Heart, Target, User, Edit, Save, X, Mail, Phone, Calendar, Ruler, Plus } from 'lucide-react';
 
 interface PatientProfileProps {
   patientId: string;
@@ -61,7 +62,7 @@ const ChartLoader: React.FC = () => (
   </div>
 );
 
-// Plotly Chart Components
+// Enhanced Plotly Chart Components
 const WeightChart: React.FC<{ 
   data: any[], 
   targetWeight?: number,
@@ -80,13 +81,21 @@ const WeightChart: React.FC<{
         type: 'scatter',
         mode: 'lines+markers',
         name: 'Peso Actual',
-        line: { color: '#0ea5e9', width: 3 },
+        line: { 
+          color: '#0ea5e9', 
+          width: 4,
+          shape: 'spline',
+          smoothing: 0.3
+        },
         marker: { 
           color: '#0ea5e9', 
-          size: 8,
-          line: { color: '#ffffff', width: 2 }
+          size: 10,
+          line: { color: '#ffffff', width: 3 },
+          symbol: 'circle'
         },
-        hovertemplate: '<b>Fecha:</b> %{x}<br><b>Peso:</b> %{y:.1f} kg<extra></extra>'
+        fill: 'tonexty',
+        fillcolor: 'rgba(14, 165, 233, 0.1)',
+        hovertemplate: '<b>%{x}</b><br>Peso: <b>%{y:.1f} kg</b><extra></extra>'
       }
     ];
 
@@ -96,57 +105,64 @@ const WeightChart: React.FC<{
         y: Array(data.length).fill(targetWeight),
         type: 'scatter',
         mode: 'lines',
-        name: 'Peso Objetivo',
+        name: 'Objetivo',
         line: { 
           color: '#ef4444', 
-          width: 2, 
-          dash: 'dash' 
+          width: 3, 
+          dash: 'dashdot'
         },
-        hovertemplate: '<b>Peso Objetivo:</b> %{y:.1f} kg<extra></extra>'
+        hovertemplate: '<b>Objetivo:</b> %{y:.1f} kg<extra></extra>'
       });
     }
 
     const layout = {
       title: {
         text: '',
-        font: { size: 16 }
+        font: { size: 18, family: 'Inter, sans-serif' }
       },
       xaxis: {
-        title: 'Fecha',
-        gridcolor: '#f3f4f6',
-        showgrid: true,
-        zeroline: false
-      },
-      yaxis: {
-        title: 'Peso (kg)',
+        title: { text: 'Fecha', font: { size: 14, color: '#6b7280' } },
         gridcolor: '#f3f4f6',
         showgrid: true,
         zeroline: false,
-        tickformat: '.1f'
+        tickfont: { size: 12, color: '#6b7280' }
       },
-      plot_bgcolor: '#ffffff',
-      paper_bgcolor: '#ffffff',
-      margin: { l: 60, r: 30, t: 30, b: 60 },
+      yaxis: {
+        title: { text: 'Peso (kg)', font: { size: 14, color: '#6b7280' } },
+        gridcolor: '#f3f4f6',
+        showgrid: true,
+        zeroline: false,
+        tickformat: '.1f',
+        tickfont: { size: 12, color: '#6b7280' }
+      },
+      plot_bgcolor: 'rgba(248, 250, 252, 0.5)',
+      paper_bgcolor: 'transparent',
+      margin: { l: 70, r: 30, t: 30, b: 70 },
       showlegend: true,
       legend: {
         x: 0,
-        y: 1,
-        bgcolor: 'rgba(255,255,255,0.8)'
+        y: 1.1,
+        orientation: 'h',
+        bgcolor: 'rgba(255,255,255,0.9)',
+        bordercolor: 'rgba(0,0,0,0.1)',
+        borderwidth: 1,
+        font: { size: 12, color: '#374151' }
       },
-      hovermode: 'closest'
+      hovermode: 'x unified',
+      font: { family: 'Inter, sans-serif' }
     };
 
     const config = {
       responsive: true,
       displayModeBar: true,
-      modeBarButtonsToRemove: ['lasso2d', 'select2d'],
+      modeBarButtonsToRemove: ['lasso2d', 'select2d', 'autoScale2d'],
       displaylogo: false,
       toImageButtonOptions: {
         format: 'png',
         filename: 'peso_paciente',
-        height: 400,
-        width: 800,
-        scale: 1
+        height: 500,
+        width: 900,
+        scale: 2
       }
     };
 
@@ -159,25 +175,39 @@ const WeightChart: React.FC<{
     };
   }, [data, targetWeight, loading]);
 
-  if (loading) return <ChartLoader />;
+  if (loading) return (
+    <div className="h-80 flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg">
+      <div className="text-center">
+        <div className="relative">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+          <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-r-blue-400 rounded-full animate-spin mx-auto" style={{ animationDelay: '0.1s' }}></div>
+        </div>
+        <p className="mt-4 text-sm font-medium text-blue-700">Cargando gráfico...</p>
+      </div>
+    </div>
+  );
   
   if (data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-gray-500">
-        <div className="text-center">
-          <div className="mx-auto h-16 w-16 text-gray-300 mb-4">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      <div className="h-80 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+        <div className="text-center max-w-md">
+          <div className="mx-auto h-20 w-20 text-gray-400 mb-6">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
-          <p>Se necesitan al menos 2 registros de peso para mostrar el gráfico</p>
-          <p className="text-sm">Registra el peso del paciente para comenzar el seguimiento</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Sin datos suficientes</h3>
+          <p className="text-gray-600 mb-4">Se necesitan al menos 2 registros de peso para mostrar el gráfico</p>
+          <div className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm">
+            <Plus className="w-4 h-4 mr-2" />
+            Registra el peso del paciente para comenzar
+          </div>
         </div>
       </div>
     );
   }
 
-  return <div ref={chartRef} className="h-64" />;
+  return <div ref={chartRef} className="h-80 bg-white rounded-lg p-2" />;
 };
 
 const IMCChart: React.FC<{ data: any[], loading: boolean }> = ({ data, loading }) => {
@@ -869,104 +899,143 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patientId, onBack }) =>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {activeTab === 'info' && (
   <div className="space-y-8">
-    {/* Key Metrics Section - More visual with icons */}
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-      <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-        <svg className="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-        Métricas Clave
-      </h3>
+    {/* Enhanced Key Metrics Section */}
+    <div className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-8 border border-blue-100 overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full -translate-y-16 translate-x-16"></div>
+      <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-indigo-200/20 to-blue-200/20 rounded-full translate-y-12 -translate-x-12"></div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-white/50">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1">Peso Actual</div>
-              <div className="text-2xl font-bold text-blue-600">
-                {patient.weightHistory[patient.weightHistory.length - 1]?.weight || 0} kg
+      <div className="relative z-10">
+        <h3 className="text-xl font-bold text-gray-900 mb-8 flex items-center">
+          <div className="p-2 bg-blue-500 rounded-lg mr-3">
+            <Activity className="w-6 h-6 text-white" />
+          </div>
+          Métricas Clave
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Weight Card */}
+          <div className="group bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-soft hover:shadow-medium transition-all duration-300 border border-white/50 hover:scale-[1.02]">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors">
+                <Scale className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold text-blue-600 mb-1">
+                  {patient.weightHistory[patient.weightHistory.length - 1]?.weight || 0}
+                </div>
+                <div className="text-sm font-medium text-gray-500">kg</div>
               </div>
             </div>
-            <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-              </svg>
+            <div className="text-sm font-semibold text-gray-700 mb-2">Peso Actual</div>
+            <div className="h-2 bg-blue-100 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, (patient.weightHistory[patient.weightHistory.length - 1]?.weight / (patient.goals?.targetWeight || 100)) * 100)}%` }}
+              ></div>
             </div>
           </div>
-        </div>
-        
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-white/50">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1">IMC Actual</div>
-              <div className="text-2xl font-bold text-green-600">{getCurrentIMC()}</div>
-              <div className={`text-xs font-semibold px-2 py-1 rounded-full mt-1 inline-block ${
-                getIMCCategory(getCurrentIMC()).category === 'Normal' ? 'bg-green-100 text-green-800' :
-                getIMCCategory(getCurrentIMC()).category === 'Sobrepeso' ? 'bg-yellow-100 text-yellow-800' :
-                getIMCCategory(getCurrentIMC()).category === 'Obesidad' ? 'bg-red-100 text-red-800' :
-                'bg-blue-100 text-blue-800'
-              }`}>
-                {getIMCCategory(getCurrentIMC()).category}
+
+          {/* BMI Card */}
+          <div className="group bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-soft hover:shadow-medium transition-all duration-300 border border-white/50 hover:scale-[1.02]">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-green-100 rounded-xl group-hover:bg-green-200 transition-colors">
+                <Heart className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold text-green-600 mb-1">
+                  {getCurrentIMC()}
+                </div>
+                <div className="text-sm font-medium text-gray-500">IMC</div>
               </div>
             </div>
-            <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
+            <div className="text-sm font-semibold text-gray-700 mb-2">IMC Actual</div>
+            <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+              getIMCCategory(getCurrentIMC()).category === 'Normal' ? 'bg-green-100 text-green-800' :
+              getIMCCategory(getCurrentIMC()).category === 'Sobrepeso' ? 'bg-yellow-100 text-yellow-800' :
+              getIMCCategory(getCurrentIMC()).category === 'Obesidad' ? 'bg-red-100 text-red-800' :
+              'bg-blue-100 text-blue-800'
+            }`}>
+              {getIMCCategory(getCurrentIMC()).category}
             </div>
           </div>
-        </div>
-        
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-white/50">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm font-medium text-gray-600 mb-1">Progreso</div>
-              <div className="text-2xl font-bold text-purple-600">{getGoalProgress().toFixed(0)}%</div>
-              <div className="mt-2">
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${getGoalProgress()}%` }}
-                  ></div>
+
+          {/* Progress Card with Circular Progress */}
+          <div className="group bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-soft hover:shadow-medium transition-all duration-300 border border-white/50 hover:scale-[1.02]">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors">
+                <Target className="w-6 h-6 text-purple-600" />
+              </div>
+              <div className="relative w-16 h-16">
+                {/* Circular Progress */}
+                <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="28"
+                    fill="none"
+                    stroke="#e5e7eb"
+                    strokeWidth="4"
+                  />
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="28"
+                    fill="none"
+                    stroke="url(#progressGradient)"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeDasharray={`${(getGoalProgress() / 100) * 175.9} 175.9`}
+                    className="transition-all duration-700 ease-out"
+                  />
+                  <defs>
+                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#8b5cf6" />
+                      <stop offset="100%" stopColor="#a855f7" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-sm font-bold text-purple-600">{getGoalProgress().toFixed(0)}%</span>
                 </div>
               </div>
             </div>
-            <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+            <div className="text-sm font-semibold text-gray-700 mb-2">Progreso del Objetivo</div>
+            <div className="text-xs text-gray-500">
+              {patient.goals?.targetWeight ? `Meta: ${patient.goals.targetWeight} kg` : 'Sin objetivo definido'}
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    {/* Patient Information Section */}
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
+    {/* Enhanced Patient Information Section */}
+    <div className="bg-white rounded-2xl shadow-soft border border-gray-100 overflow-hidden">
+      <div className="bg-gradient-to-r from-gray-50 to-blue-50 px-8 py-6 border-b border-gray-100">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-            <svg className="w-5 h-5 text-gray-700 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            Información Personal
-          </h3>
+          <div className="flex items-center">
+            <div className="p-3 bg-blue-500 rounded-xl mr-4">
+              <User className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900">Información Personal</h3>
+              <p className="text-sm text-gray-600">Datos del paciente y contacto</p>
+            </div>
+          </div>
           {!editingInfo ? (
             <button
               onClick={() => setEditingInfo(true)}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 shadow-sm hover:shadow-md"
             >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
+              <Edit className="w-4 h-4 mr-2" />
               Editar
             </button>
           ) : (
-            <div className="flex space-x-2">
+            <div className="flex space-x-3">
               <button
                 onClick={handleSaveInfo}
                 disabled={submittingInfo}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-all duration-200 shadow-md hover:shadow-lg"
               >
                 {submittingInfo ? (
                   <>
@@ -975,9 +1044,7 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patientId, onBack }) =>
                   </>
                 ) : (
                   <>
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <Save className="w-4 h-4 mr-2" />
                     Guardar
                   </>
                 )}
@@ -994,9 +1061,10 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patientId, onBack }) =>
                     height: patient?.height || 0
                   });
                 }}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition-all duration-200"
                 disabled={submittingInfo}
               >
+                <X className="w-4 h-4 mr-2" />
                 Cancelar
               </button>
             </div>
@@ -1127,146 +1195,71 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patientId, onBack }) =>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Personal Information Column */}
+            {/* Enhanced info display cards */}
             <div className="space-y-6">
-              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide border-b border-gray-200 pb-2">
+              <h4 className="text-lg font-semibold text-gray-900 border-l-4 border-blue-500 pl-4">
                 Información Personal
               </h4>
               
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+              {[
+                { icon: User, label: 'Nombre completo', value: patient?.name || 'No especificado', color: 'blue' },
+                { icon: Calendar, label: 'Edad', value: patient?.age ? `${patient.age} años` : 'No especificado', color: 'green' },
+                { icon: User, label: 'Género', value: patient?.gender === 'male' ? 'Masculino' : patient?.gender === 'female' ? 'Femenino' : patient?.gender === 'other' ? 'Otro' : 'No especificado', color: 'purple' },
+                { icon: Ruler, label: 'Altura', value: patient?.height ? `${patient.height} cm` : 'No especificado', color: 'amber' }
+              ].map((item, index) => (
+                <div key={index} className="group flex items-center p-4 bg-gray-50 rounded-xl hover:bg-white hover:shadow-md transition-all duration-200">
+                  <div className={`p-3 bg-${item.color}-100 rounded-lg mr-4 group-hover:bg-${item.color}-200 transition-colors`}>
+                    <item.icon className={`w-5 h-5 text-${item.color}-600`} />
                   </div>
                   <div className="flex-1">
-                    <div className="text-sm text-gray-500">Nombre completo</div>
-                    <div className="text-lg font-medium text-gray-900">{patient?.name || 'No especificado'}</div>
+                    <div className="text-sm font-medium text-gray-500 mb-1">{item.label}</div>
+                    <div className="text-lg font-semibold text-gray-900">{item.value}</div>
                   </div>
                 </div>
-
-                <div className="flex items-center space-x-3">
-                  <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a1 1 0 011 1v9a1 1 0 01-1 1H5a1 1 0 01-1-1V8a1 1 0 011-1h3z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm text-gray-500">Edad</div>
-                    <div className="text-lg font-medium text-gray-900">
-                      {patient?.age ? `${patient.age} años` : 'No especificado'}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 2a3 3 0 100 6 3 3 0 000-6zM4 18a6 6 0 1112 0H4z" />
-                  </svg>
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm text-gray-500">Género</div>
-                    <div className="text-lg font-medium text-gray-900">
-                      {patient?.gender === 'male' ? 'Masculino' : 
-                        patient?.gender === 'female' ? 'Femenino' : 
-                        patient?.gender === 'other' ? 'Otro' : 'No especificado'}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M4 2h2v20H4V2zm14 0h2v20h-2V2zm-6 0h2v20h-2V2z" />
-                  </svg>
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm text-gray-500">Altura</div>
-                    <div className="text-lg font-medium text-gray-900">
-                      {patient?.height ? `${patient.height} cm` : 'No especificado'}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
 
-            {/* Contact Information Column */}
+            {/* Contact Information Column with similar styling */}
             <div className="space-y-6">
-              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide border-b border-gray-200 pb-2">
+              <h4 className="text-lg font-semibold text-gray-900 border-l-4 border-green-500 pl-4">
                 Información de Contacto
               </h4>
               
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
+              {[
+                { icon: Mail, label: 'Email', value: patient?.email || 'No especificado', color: 'blue' },
+                { icon: Phone, label: 'Teléfono', value: patient?.phone || 'No especificado', color: 'green' }
+              ].map((item, index) => (
+                <div key={index} className="group flex items-center p-4 bg-gray-50 rounded-xl hover:bg-white hover:shadow-md transition-all duration-200">
+                  <div className={`p-3 bg-${item.color}-100 rounded-lg mr-4 group-hover:bg-${item.color}-200 transition-colors`}>
+                    <item.icon className={`w-5 h-5 text-${item.color}-600`} />
                   </div>
                   <div className="flex-1">
-                    <div className="text-sm text-gray-500">Email</div>
-                    <div className="text-lg font-medium text-gray-900">
-                      {patient?.email || 'No especificado'}
-                    </div>
+                    <div className="text-sm font-medium text-gray-500 mb-1">{item.label}</div>
+                    <div className="text-lg font-semibold text-gray-900">{item.value}</div>
                   </div>
                 </div>
-
-                <div className="flex items-center space-x-3">
-                  <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm text-gray-500">Teléfono</div>
-                    <div className="text-lg font-medium text-gray-900">
-                      {patient?.phone || 'No especificado'}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              ))}
 
               {/* Additional Information */}
               <div className="mt-8">
-                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide border-b border-gray-200 pb-2 mb-4">
+                <h4 className="text-lg font-semibold text-gray-900 border-l-4 border-purple-500 pl-4 mb-4">
                   Información Adicional
                 </h4>
                 
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-                      </svg>
+                {[
+                  { icon: Scale, label: 'Peso inicial', value: patient?.weightHistory[0]?.weight ? `${patient.weightHistory[0].weight} kg` : 'No registrado', color: 'blue' },
+                  { icon: Calendar, label: 'Paciente desde', value: patient?.createdAt ? patient.createdAt.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : 'No disponible', color: 'green' }
+                ].map((item, index) => (
+                  <div key={index} className="group flex items-center p-4 bg-gray-50 rounded-xl hover:bg-white hover:shadow-md transition-all duration-200 mb-4">
+                    <div className={`p-3 bg-${item.color}-100 rounded-lg mr-4 group-hover:bg-${item.color}-200 transition-colors`}>
+                      <item.icon className={`w-5 h-5 text-${item.color}-600`} />
                     </div>
                     <div className="flex-1">
-                      <div className="text-sm text-gray-500">Peso inicial</div>
-                      <div className="text-lg font-medium text-gray-900">
-                        {patient?.weightHistory[0]?.weight ? `${patient.weightHistory[0].weight} kg` : 'No registrado'}
-                      </div>
+                      <div className="text-sm font-medium text-gray-500 mb-1">{item.label}</div>
+                      <div className="text-lg font-semibold text-gray-900">{item.value}</div>
                     </div>
                   </div>
-
-                  <div className="flex items-center space-x-3">
-                    <div className="flex-shrink-0 h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h.01M3 20h18v-8H3v8z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-sm text-gray-500">Paciente desde</div>
-                      <div className="text-lg font-medium text-gray-900">
-                        {patient?.createdAt ? patient.createdAt.toLocaleDateString('es-ES', {
-                          day: '2-digit',
-                          month: 'long',
-                          year: 'numeric'
-                        }) : 'No disponible'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
