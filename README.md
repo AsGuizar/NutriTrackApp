@@ -9,20 +9,6 @@
 
 **NutriTrack** es una aplicación web diseñada para nutricionistas profesionales. Permite gestionar pacientes, dar seguimiento a su progreso nutricional, programar citas y visualizar métricas en tiempo real.
 
-## 📸 Capturas de Pantalla
-
-<!-- Descomentar cuando tengas las imágenes y colócalas en /docs/images/ -->
-<!--
-![Dashboard](./docs/images/dashboard.png)
-*Dashboard principal con listado de pacientes*
-
-![Perfil](./docs/images/patient-profile.png)
-*Perfil detallado del paciente con gráficos de progreso*
-
-![Calendario](./docs/images/calendar.png)
-*Calendario de citas mensual*
--->
-
 ## ✨ Características Principales
 
 ### 🔐 Autenticación y Seguridad
@@ -61,7 +47,6 @@
 * **React 18** con TypeScript
 * **Tailwind CSS** para estilos
 * **Plotly** para gráficos interactivos
-* **Recharts** para visualización de datos
 
 ### Backend (Firebase)
 * **Firebase Authentication** - Autenticación segura
@@ -167,62 +152,7 @@ npm test
 
 ## 🌐 Demo en Vivo
 
-> 🔜 **Próximamente**: Link a la demo desplegada
-
-## 🤝 Contribución
-
-¡Las contribuciones son bienvenidas! Por favor sigue estos pasos:
-
-1. Revisa los [issues abiertos](https://github.com/AsGuizar/NutriTrackApp/issues)
-2. Haz **fork** del proyecto
-3. Crea tu rama de feature (`git checkout -b feature/NuevaCaracteristica`)
-4. Haz commit de tus cambios (`git commit -m 'Agregar: nueva característica increíble'`)
-5. Push a la rama (`git push origin feature/NuevaCaracteristica`)
-6. Abre un **Pull Request** con descripción detallada
-
-### Convenciones de Commits
-
-* `Agregar:` - Nueva funcionalidad
-* `Corregir:` - Bug fixes
-* `Actualizar:` - Cambios en funcionalidad existente
-* `Docs:` - Cambios en documentación
-
-## 🗺️ Roadmap
-
-- [x] Sistema de autenticación
-- [x] CRUD de pacientes
-- [x] Gráficos de progreso
-- [x] Sistema de citas
-- [ ] Exportar informes en PDF
-- [ ] Sistema de recordatorios por email/SMS
-- [ ] Planes alimenticios personalizados
-- [ ] App móvil con React Native
-- [ ] Integración con wearables (Fitbit, Apple Health)
-- [ ] Multi-idioma (inglés, portugués)
-
-## 🆘 Solución de Problemas
-
-### Error de Autenticación
-* Verifica que las credenciales en `.env.local` sean correctas
-* Asegúrate de haber habilitado Email/Password en Firebase Console
-
-### Error de Base de Datos
-* Revisa las reglas de seguridad de Firestore
-* Verifica que el usuario esté autenticado antes de hacer queries
-
-### Error de Build
-* Ejecuta `npm install` para reinstalar dependencias
-* Limpia la caché: `npm cache clean --force`
-* Verifica que Node.js sea v18 o superior
-
-### La aplicación no carga
-* Revisa la consola del navegador para errores
-* Verifica que todas las variables de entorno estén configuradas
-* Asegúrate de que Firebase esté correctamente inicializado
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
+>  https://nutritrack-d6bd5.web.app
 
 ## 👨‍💻 Autor
 
