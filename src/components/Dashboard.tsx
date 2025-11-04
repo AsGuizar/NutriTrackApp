@@ -15,7 +15,7 @@ interface DashboardProps {
  * Muestra una vista general de todos los pacientes con métricas clave
  */
 const Dashboard: React.FC<DashboardProps> = ({ onAddPatient, onPatientClick }) => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, } = useAuth();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

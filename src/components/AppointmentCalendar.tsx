@@ -25,12 +25,30 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ onBack }) => 
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [loading, setLoading] = useState(true);
   
-  const [newAppointment, setNewAppointment] = useState({
+  const [newAppointment, setNewAppointment] = useState<{
+    patientId: string;
+    time: string;
+    notes: string;
+    status: 'scheduled' | 'completed' | 'cancelled';
+  }>({
     patientId: '',
     time: '',
     notes: '',
-    status: 'scheduled' as const
+    status: 'scheduled'
   });
+
+  // NEW: Effect to populate form when editing an appointment
+  useEffect(() => {
+    if (selectedAppointment) {
+      setNewAppointment({
+        patientId: selectedAppointment.patientId,
+        time: selectedAppointment.time,
+        notes: selectedAppointment.notes || '',
+        status: selectedAppointment.status
+      });
+      setSelectedDate(new Date(selectedAppointment.date));
+    }
+  }, [selectedAppointment]);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -321,7 +339,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ onBack }) => 
                       onClick={() => setSelectedAppointment(appointment)}
                       className="text-xs p-1 rounded cursor-pointer hover:bg-gray-100 truncate"
                       style={{ backgroundColor: appointment.status === 'scheduled' ? '#dbeafe' : 
-                               appointment.status === 'completed' ? '#dcfce7' : '#fee2e2' }}
+                              appointment.status === 'completed' ? '#dcfce7' : '#fee2e2' }}
                     >
                       <div className="font-medium text-gray-900">
                         {appointment.time} - {getPatientName(appointment.patientId)}
@@ -369,7 +387,10 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({ onBack }) => 
               <form onSubmit={(e) => {
                 e.preventDefault();
                 if (selectedAppointment) {
-                  handleUpdateAppointment(selectedAppointment.id, newAppointment);
+                  handleUpdateAppointment(selectedAppointment.id, {
+                    ...newAppointment,
+                    date: selectedDate || selectedAppointment.date
+                  });
                 } else {
                   handleAddAppointment();
                 }

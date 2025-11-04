@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 /**
- * Componente de Login para la aplicación Nutri-App
+ * Componente de Login para la aplicación NutriTrack
  * Permite a los nutricionistas acceder con email y password
  */
 const Login: React.FC = () => {
@@ -69,7 +69,7 @@ const Login: React.FC = () => {
             <span className="text-3xl text-white font-bold">🥗</span>
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Nutri-App
+            NutriTrack
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Sistema de gestión para nutricionistas
